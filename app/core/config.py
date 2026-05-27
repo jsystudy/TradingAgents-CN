@@ -50,6 +50,12 @@ class Settings(BaseSettings):
     @property
     def MONGO_URI(self) -> str:
         """构建MongoDB URI"""
+        # 优先使用完整的 MONGODB_URL 环境变量（用于 Render 等云平台）
+        mongodb_url = os.environ.get("MONGODB_URL", "")
+        if mongodb_url:
+            return mongodb_url
+        
+        # 否则使用原有的构建逻辑
         if self.MONGODB_USERNAME and self.MONGODB_PASSWORD:
             return f"mongodb://{self.MONGODB_USERNAME}:{self.MONGODB_PASSWORD}@{self.MONGODB_HOST}:{self.MONGODB_PORT}/{self.MONGO_DB}?authSource={self.MONGODB_AUTH_SOURCE}"
         else:
