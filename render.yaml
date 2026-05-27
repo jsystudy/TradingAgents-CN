@@ -7,38 +7,45 @@ services:
     plan: free
     healthCheckPath: /api/health
     envVars:
-      # MongoDB Atlas 连接字符串（必需）
-      # 格式：mongodb+srv://username:password@cluster.mongodb.net/tradingagents
+      # MongoDB Atlas 连接字符串
       - key: MONGODB_URL
         sync: false
-      # Redis 连接字符串（自动从 Render Redis 服务获取）
+      # MongoDB 数据库名
+      - key: MONGODB_DATABASE
+        value: "tradingagents"
+      - key: MONGODB_DATABASE_SCOPE
+        value: "explicit"
+      # Redis 连接（从 Render Redis 服务自动获取）
       - key: REDIS_URL
         fromService:
           name: tradingagents-redis
           type: redis
           property: connectionString
-      # Docker 环境标识
-      - key: DOCKER_CONTAINER
-        value: "true"
+      # JWT 密钥
+      - key: JWT_SECRET
+        value: "tradingagents-render-jwt-secret-2026"
+      # 生产环境
+      - key: DEBUG
+        value: "false"
       # API 配置
-      - key: API_HOST
+      - key: HOST
         value: "0.0.0.0"
-      - key: API_PORT
+      - key: PORT
         value: "8000"
-      # CORS 配置（允许前端域名访问）
+      # CORS 配置
       - key: CORS_ORIGINS
         value: "https://tradingagents-frontend.onrender.com"
-      # 时区设置
+      - key: ALLOWED_ORIGINS
+        value: "https://tradingagents-frontend.onrender.com"
+      # 时区
       - key: TZ
         value: "Asia/Shanghai"
-      # 日志配置
+      # 日志
       - key: LOG_LEVEL
         value: "INFO"
-      # 数据库配置（使用环境变量）
-      - key: MONGODB_DATABASE
-        value: "tradingagents"
-      - key: MONGODB_DATABASE_SCOPE
-        value: "explicit"
+      # Docker 标识
+      - key: DOCKER_CONTAINER
+        value: "true"
 
   # 前端服务
   - type: web
@@ -47,9 +54,8 @@ services:
     dockerfilePath: ./Dockerfile.frontend.render
     plan: free
     envVars:
-      # 后端 API 地址
       - key: VITE_API_BASE_URL
-        value: "https://tradingagents-backend.onrender.com"
+        value: "https://tradingagents-backend-kfv.onrender.com"
 
   # Redis 数据库
   - type: redis

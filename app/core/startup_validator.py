@@ -188,6 +188,16 @@ class StartupValidator:
         for config in self.REQUIRED_CONFIGS:
             value = os.getenv(config.key)
             
+            # 特殊处理：如果有 MONGODB_URL，就不需要单独的 MONGODB_HOST/PORT
+            if not value and config.key in ("MONGODB_HOST", "MONGODB_PORT") and os.getenv("MONGODB_URL"):
+                logger.debug(f"✅ {config.key}: 由 MONGODB_URL 提供")
+                continue
+            
+            # 特殊处理：如果有 REDIS_URL，就不需要单独的 REDIS_HOST/PORT
+            if not value and config.key in ("REDIS_HOST", "REDIS_PORT") and os.getenv("REDIS_URL"):
+                logger.debug(f"✅ {config.key}: 由 REDIS_URL 提供")
+                continue
+            
             if not value:
                 self.result.missing_required.append(config)
                 logger.error(f"❌ 缺少必需配置: {config.key}")

@@ -120,6 +120,11 @@ class Settings(BaseSettings):
     @property
     def REDIS_URL(self) -> str:
         """构建Redis URL"""
+        # 优先使用完整的 REDIS_URL 环境变量（用于 Render 等云平台）
+        redis_url = os.environ.get("REDIS_URL", "")
+        if redis_url:
+            return redis_url
+        # 否则使用原有的构建逻辑
         if self.REDIS_PASSWORD:
             return f"redis://:{self.REDIS_PASSWORD}@{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
         else:
