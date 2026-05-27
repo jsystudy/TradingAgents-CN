@@ -35,8 +35,6 @@ services:
       # CORS 配置
       - key: CORS_ORIGINS
         value: "https://tradingagents-frontend.onrender.com"
-      - key: ALLOWED_ORIGINS
-        value: "https://tradingagents-frontend.onrender.com"
       # 时区
       - key: TZ
         value: "Asia/Shanghai"
