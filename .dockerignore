@@ -121,7 +121,7 @@ docker-compose.*.yml
 
 # 脚本（保留Python脚本，排除Shell脚本）
 # scripts/ - 注释掉，因为需要Python初始化脚本
-scripts/*.sh
+# scripts/*.sh
 scripts/*.ps1
 scripts/build-and-publish-*.sh
 scripts/full_redeploy_*.sh

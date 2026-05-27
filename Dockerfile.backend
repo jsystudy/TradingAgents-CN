@@ -25,6 +25,9 @@ RUN mkdir -p /app/logs /app/data /app/config && \
     echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
     echo 'Acquire::http::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries && \
     echo 'Acquire::https::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries && \
+    # 使用清华 Debian 镜像加速
+    sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
+    sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list 2>/dev/null || true && \
     # 更新软件源，允许失败后继续
     (apt-get update || apt-get update || apt-get update) && \
     apt-get install -y --no-install-recommends \
@@ -42,12 +45,12 @@ RUN mkdir -p /app/logs /app/data /app/config && \
         PANDOC_ARCH="amd64"; \
         WKHTMLTOPDF_ARCH="amd64"; \
     fi && \
-    # 下载并安装 pandoc
-    wget -q https://github.com/jgm/pandoc/releases/download/3.8.2.1/pandoc-3.8.2.1-1-${PANDOC_ARCH}.deb && \
+    # 下载并安装 pandoc (使用 ghproxy 镜像加速)
+    wget -q https://ghproxy.net/https://github.com/jgm/pandoc/releases/download/3.8.2.1/pandoc-3.8.2.1-1-${PANDOC_ARCH}.deb && \
     dpkg -i pandoc-3.8.2.1-1-${PANDOC_ARCH}.deb && \
     rm pandoc-3.8.2.1-1-${PANDOC_ARCH}.deb && \
-    # 下载并安装 wkhtmltopdf
-    wget -q https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bookworm_${WKHTMLTOPDF_ARCH}.deb && \
+    # 下载并安装 wkhtmltopdf (使用 ghproxy 镜像加速)
+    wget -q https://ghproxy.net/https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bookworm_${WKHTMLTOPDF_ARCH}.deb && \
     apt-get install -y --no-install-recommends \
         ./wkhtmltox_0.12.6.1-3.bookworm_${WKHTMLTOPDF_ARCH}.deb && \
     rm wkhtmltox_0.12.6.1-3.bookworm_${WKHTMLTOPDF_ARCH}.deb && \
@@ -85,5 +88,5 @@ EXPOSE 8000
 # Docker环境标识
 ENV DOCKER_CONTAINER=true
 
-# 启动FastAPI服务
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 启动FastAPI服务（自动初始化管理员）
+CMD ["/app/scripts/startup_init.sh"]
