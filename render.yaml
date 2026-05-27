@@ -32,9 +32,9 @@ services:
         value: "0.0.0.0"
       - key: PORT
         value: "8000"
-      # CORS 配置
+      # CORS 配置（允许前端域名）
       - key: CORS_ORIGINS
-        value: "*"
+        value: "https://tradingagents-frontend-q4ig.onrender.com"
       # 时区
       - key: TZ
         value: "Asia/Shanghai"
@@ -53,9 +53,9 @@ services:
     plan: free
     envVars:
       - key: VITE_API_BASE_URL
-        value: "https://tradingagents-backend-kfv.onrender.com"
+        value: "https://tradingagents-backend-kfuv.onrender.com"
       - key: BACKEND_URL
-        value: "https://tradingagents-backend-kfv.onrender.com"
+        value: "https://tradingagents-backend-kfuv.onrender.com"
 
   # Redis 数据库
   - type: redis
