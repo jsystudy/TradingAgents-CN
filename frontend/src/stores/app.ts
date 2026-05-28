@@ -204,7 +204,8 @@ export const useAppStore = defineStore('app', {
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 3000) // 3秒超时
 
-        const response = await fetch('/api/health', {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
+        const response = await fetch(`${baseUrl}/api/health`, {
           method: 'GET',
           signal: controller.signal
         })

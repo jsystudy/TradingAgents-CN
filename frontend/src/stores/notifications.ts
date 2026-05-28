@@ -90,10 +90,19 @@ export const useNotificationStore = defineStore('notifications', () => {
       }
 
       // WebSocket 连接地址
-      // 🔥 统一使用当前访问的服务器地址（开发环境通过 Vite 代理，生产环境通过 Nginx 代理）
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const host = window.location.host
-      const wsUrl = `${wsProtocol}//${host}/api/ws/notifications?token=${encodeURIComponent(token)}`
+      // 🔥 使用后端直连地址（避免走nginx代理）
+      const wsBase = import.meta.env.VITE_API_BASE_URL || ''
+      let wsUrl: string
+      if (wsBase) {
+        // 有后端直连地址：转换 http(s) -> ws(s)
+        const wsBase2 = wsBase.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:')
+        wsUrl = `${wsBase2}/api/ws/notifications?token=${encodeURIComponent(token)}`
+      } else {
+        // 降级：使用当前host（开发环境通过Vite代理）
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+        const host = window.location.host
+        wsUrl = `${wsProtocol}//${host}/api/ws/notifications?token=${encodeURIComponent(token)}`
+      }
 
       console.log('[WS] 连接到:', wsUrl)
 
