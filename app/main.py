@@ -728,6 +728,8 @@ app.include_router(financial_data.router, tags=["financial-data"])
 app.include_router(news_data.router, tags=["news-data"])
 app.include_router(social_media.router, tags=["social-media"])
 app.include_router(internal_messages.router, tags=["internal-messages"])
+from app.routers.data_import import router as data_import_router
+app.include_router(data_import_router, prefix="/api/data", tags=["data-import"])
 
 
 @app.get("/")
