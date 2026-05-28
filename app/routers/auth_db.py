@@ -475,6 +475,42 @@ async def create_user(
         logger.error(f"创建用户失败: {e}")
         raise HTTPException(status_code=500, detail=f"创建用户失败: {str(e)}")
 
+@router.post("/setup")
+async def setup_admin():
+    """首次部署初始化 - 创建默认管理员用户（仅在无用户时生效）"""
+    try:
+        existing = await user_service.get_user_by_username("admin")
+        if existing:
+            return {"success": True, "message": "管理员用户已存在", "data": {"username": "admin"}}
+
+        from app.models.user import UserCreate
+        user_create = UserCreate(
+            username="admin",
+            email="admin@tradingagents.cn",
+            password="admin123"
+        )
+        new_user = await user_service.create_user(user_create)
+        if not new_user:
+            raise HTTPException(status_code=500, detail="创建管理员用户失败")
+
+        # 设置管理员权限
+        from pymongo import MongoClient
+        from app.core.config import settings
+        client = MongoClient(settings.MONGO_URI)
+        db = client[settings.MONGO_DB]
+        db.users.update_one({"username": "admin"}, {"$set": {"is_admin": True}})
+
+        return {
+            "success": True,
+            "message": "管理员用户创建成功",
+            "data": {"username": "admin", "password": "admin123"}
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"初始化失败: {e}")
+        raise HTTPException(status_code=500, detail=f"初始化失败: {str(e)}")
+
 @router.get("/users")
 async def list_users(
     skip: int = 0,
