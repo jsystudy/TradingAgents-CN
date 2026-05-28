@@ -46,6 +46,7 @@ async def get_database_status():
     """获取数据库状态"""
     try:
         service = BaoStockInitService()
+        await service.initialize()
         status = await service.check_database_status()
         
         return {
@@ -317,6 +318,7 @@ async def get_service_status():
     """获取BaoStock服务状态"""
     try:
         service = BaoStockSyncService()
+        await service.initialize()
         status = await service.check_service_status()
         
         return {
